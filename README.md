@@ -14,3 +14,10 @@ Retrieval --> Summarizer
 Summarizer --> ActionExtractor
 ActionExtractor --> StructuredOutput
 ```
+
+
+---
+
+# License
+
+MIT License
