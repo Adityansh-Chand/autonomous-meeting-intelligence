@@ -1,73 +1,16 @@
-
 # Autonomous Meeting Intelligence
 
-![Python](https://img.shields.io/badge/python-3.11-blue)
-![Docker](https://img.shields.io/badge/docker-ready-blue)
-![Kubernetes](https://img.shields.io/badge/kubernetes-supported-green)
-![License](https://img.shields.io/badge/license-MIT-green)
-
-## Overview
-
-LLM-based meeting understanding system for summarization and action extraction.
-
-Production-style AI architecture demonstrating distributed AI agents, orchestration workflows, and scalable infrastructure.
-
----
+LLM-based meeting understanding and structured extraction system.
 
 ## Architecture
 
 ```mermaid
 flowchart LR
 
-User --> API
-API --> RouterAgent
-RouterAgent --> DomainAgents
-DomainAgents --> DecisionEngine
-DecisionEngine --> ExternalSystems
-DecisionEngine --> Monitoring
-
-Monitoring --> Dashboard
+Transcript --> Chunker
+Chunker --> Embedding
+Embedding --> Retrieval
+Retrieval --> Summarizer
+Summarizer --> ActionExtractor
+ActionExtractor --> StructuredOutput
 ```
-
----
-
-## Features
-
-• distributed AI agents  
-• containerized microservices  
-• evaluation pipelines  
-• Kubernetes manifests  
-• CI/CD workflow  
-• observability ready  
-
----
-
-## Demo
-
-![demo](demo/demo.gif)
-
----
-
-## Run locally
-
-pip install -r requirements.txt
-
-python api/server.py
-
----
-
-## Docker
-
-docker compose up --build
-
----
-
-## Kubernetes
-
-kubectl apply -f k8s/
-
----
-
-## License
-
-MIT
