@@ -17,9 +17,9 @@ Structurer --> Validator
 transcript → chunk → extract → structure → validate
 
 ### Highlights
-schema validation
-structured extraction
-modular NLP pipeline
+schema validation, 
+structured extraction and 
+modular NLP pipeline.
 
 ## License
 MIT
