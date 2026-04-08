@@ -11,7 +11,7 @@ Transcript --> Chunker
 Chunker --> Extractor
 Extractor --> Structurer
 Structurer --> Validator
-``
+```
 
 ## Pipeline
 transcript → chunk → extract → structure → validate
