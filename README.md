@@ -1,23 +1,22 @@
+
 # Autonomous Meeting Intelligence
 
-LLM-based meeting understanding and structured extraction system.
+AI engineering project demonstrating modular pipeline design, evaluation awareness, and production-style architecture.
 
-## Architecture
+## Key Capabilities
 
-```mermaid
-flowchart LR
+• config-driven pipelines
+• modular components
+• evaluation scaffold
+• logging enabled
+• test structure
 
-Transcript --> Chunker
-Chunker --> Embedding
-Embedding --> Retrieval
-Retrieval --> Summarizer
-Summarizer --> ActionExtractor
-ActionExtractor --> StructuredOutput
-```
+## Engineering Focus
 
+reproducible pipelines
+structured reasoning
+extensible architecture
 
----
+## License
 
-# License
-
-MIT License
+MIT
