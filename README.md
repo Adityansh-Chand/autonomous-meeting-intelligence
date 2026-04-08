@@ -1,22 +1,25 @@
 
 # Autonomous Meeting Intelligence
 
-AI engineering project demonstrating modular pipeline design, evaluation awareness, and production-style architecture.
+LLM-powered structured transcript understanding pipeline.
 
-## Key Capabilities
+## Architecture
 
-• config-driven pipelines
-• modular components
-• evaluation scaffold
-• logging enabled
-• test structure
+```mermaid
+flowchart LR
+Transcript --> Chunker
+Chunker --> Extractor
+Extractor --> Structurer
+Structurer --> Validator
+``
 
-## Engineering Focus
+## Pipeline
+transcript â†’ chunk â†’ extract â†’ structure â†’ validate
 
-reproducible pipelines
-structured reasoning
-extensible architecture
+### Highlights
+schema validation
+structured extraction
+modular NLP pipeline
 
 ## License
-
 MIT
