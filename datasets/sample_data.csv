@@ -1,4 +1,4 @@
-id,feature,label
-1,example,0
-2,example,1
-3,example,0
+id,transcript,expected_actions,expected_decisions
+1,"Decision: approve the beta launch. Priya will follow up with legal by Friday. Arjun will prepare the rollout checklist next week.",2,1
+2,"The team reviewed churn. We decided to pause discounting. Action: Maya to send customer notes by tomorrow.",1,1
+3,"Weekly sync covered hiring updates. No decision was made. Ravi will share interview feedback by EOD.",1,0
