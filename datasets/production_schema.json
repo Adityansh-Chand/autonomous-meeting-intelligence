@@ -1,0 +1,24 @@
+{
+  "meeting_transcript": {
+    "meeting_id": "string",
+    "tenant_id": "string",
+    "title": "string",
+    "participants": ["string"],
+    "transcript": "string",
+    "source": "zoom | teams | meet | uploaded_file",
+    "started_at": "ISO-8601 timestamp",
+    "ended_at": "ISO-8601 timestamp"
+  },
+  "gold_output": {
+    "meeting_id": "string",
+    "summary": "string",
+    "decisions": ["string"],
+    "action_items": [
+      {
+        "task": "string",
+        "owner": "string",
+        "due_date": "string"
+      }
+    ]
+  }
+}
