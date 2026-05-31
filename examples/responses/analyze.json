@@ -1,0 +1,20 @@
+{
+  "summary": "Decision: approve launch.",
+  "decisions": [
+    "approve launch."
+  ],
+  "action_items": [
+    {
+      "task": "Priya will follow up with legal by Friday.",
+      "owner": "Priya",
+      "due_date": "Friday",
+      "source_text": "Priya will follow up with legal by Friday."
+    },
+    {
+      "task": "Arjun will prepare rollout notes next week.",
+      "owner": "Arjun",
+      "due_date": "next week",
+      "source_text": "Arjun will prepare rollout notes next week."
+    }
+  ]
+}
