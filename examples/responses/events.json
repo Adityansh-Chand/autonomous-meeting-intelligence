@@ -1,0 +1,13 @@
+{
+  "events": [
+    {
+      "event_type": "meeting_analysis",
+      "payload": {
+        "summary": "Decision: approve launch.",
+        "decision_count": 1,
+        "action_count": 2
+      },
+      "created_at": "2026-05-31 10:00:00"
+    }
+  ]
+}

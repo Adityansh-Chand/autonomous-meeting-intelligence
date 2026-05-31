@@ -20,6 +20,8 @@ flowchart LR
 - `GET /events` protected when `API_KEY` is set
 - `POST /analyze`
 
+See `DEMO.md` for terminal demo steps, curl commands, and sample request/response files.
+
 Example:
 
 ```json
