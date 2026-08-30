@@ -12,9 +12,16 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
-          python-version: "3.11"
+          python-version: "3.13"
       - name: Install dependencies
         run: pip install -r requirements.txt
+
+      # Prove the committed transcripts and classifier are reproducible.
+      - name: Transcripts are reproducible
+        run: python training/generate_transcripts.py --check
+      - name: Committed metrics are reproducible
+        run: python training/train.py --verify
+
       - name: Run tests
         run: python -m pytest -q
       - name: Run evaluation
