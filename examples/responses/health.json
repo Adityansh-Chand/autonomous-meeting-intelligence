@@ -1,3 +1,10 @@
 {
-  "status": "running"
+  "status": "running",
+  "model": {
+    "model_type": "TF-IDF (word + char n-grams) -> LogisticRegression, 3-class",
+    "data_source": "synthetic -- training/generate_transcripts.py",
+    "split": "held-out TEMPLATES, not rows -- every test sentence uses phrasing absent from training",
+    "test_macro_f1": 0.5894,
+    "keyword_baseline_macro_f1": 0.3235
+  }
 }

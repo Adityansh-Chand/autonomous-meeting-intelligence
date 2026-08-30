@@ -5,7 +5,7 @@ from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
 
 from monitoring.metrics import metrics
-from nlp.extractor import extract_meeting_intelligence
+from nlp.extractor import extract_meeting_intelligence, load_classifier
 from schema.output_schema import to_dict
 from utils.security import request_id_middleware, require_api_key
 from utils.storage import recent_events, save_event
@@ -56,7 +56,18 @@ def health():
 
 @app.get("/health")
 def health_check():
-    return {"status": "running"}
+    """Health plus the identity of the classifier actually loaded."""
+    _, metadata = load_classifier()
+    return {
+        "status": "running",
+        "model": {
+            "model_type": metadata["model_type"],
+            "data_source": metadata["data_source"],
+            "split": metadata["split"],
+            "test_macro_f1": metadata["test_macro_f1"],
+            "keyword_baseline_macro_f1": metadata["legacy_keyword_baseline"]["macro_f1"],
+        },
+    }
 
 
 @app.get("/metrics")
