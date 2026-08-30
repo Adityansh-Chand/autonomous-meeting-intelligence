@@ -155,6 +155,27 @@ docker compose up --build
 Kubernetes manifests live in `k8s/deployment.yaml` and include probes, resource
 limits, a Service, and a PVC for the SQLite event store.
 
+## Cross-service integration (optional)
+
+Extracted decisions and action items can be published to the retrieval service so
+they become searchable:
+
+```
+RAG_API_URL          retrieval service base URL
+INTEGRATION_API_KEY  X-API-Key, when it requires one
+PUBLISH_TO_RAG=0     disable publishing while still configured
+```
+
+A decision recorded in a meeting is exactly the thing someone later searches for
+and cannot find. Indexing it makes *"what did we decide about the migration
+plan?"* answerable from the same endpoint that answers policy questions. Owners
+and due dates are kept inline, because "who owns it" is the follow-up question.
+
+Unset `RAG_API_URL` and analysis behaves exactly as documented above. Publishing
+is non-blocking: if retrieval is down, the analysis still returns and the response
+says the publish did not happen. Meetings with no decisions and no action items
+are never published — indexing chatter would pollute the corpus for everyone.
+
 ## Reviewer Status
 
 **What is real and independently checkable:**
