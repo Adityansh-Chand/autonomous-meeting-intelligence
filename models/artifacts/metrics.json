@@ -1,0 +1,96 @@
+{
+  "model_type": "TF-IDF (word + char n-grams) -> LogisticRegression, 3-class",
+  "data_source": "synthetic -- training/generate_transcripts.py",
+  "labels": [
+    "action_item",
+    "decision",
+    "neither"
+  ],
+  "split": "held-out TEMPLATES, not rows -- every test sentence uses phrasing absent from training",
+  "n_train": 2378,
+  "n_test": 776,
+  "n_held_out_templates": 18,
+  "held_out_templates": [
+    "action_item:01",
+    "action_item:08",
+    "action_item:09",
+    "action_item:12",
+    "action_item:13",
+    "action_item:18",
+    "decision:12",
+    "decision:14",
+    "decision:15",
+    "decision:18",
+    "decision:21",
+    "decision:22",
+    "neither:03",
+    "neither:09",
+    "neither:14",
+    "neither:16",
+    "neither:18",
+    "neither:19"
+  ],
+  "best_C": 0.5,
+  "cv_macro_f1": 1.0,
+  "test_macro_f1": 0.5894,
+  "per_class": {
+    "action_item": {
+      "precision": 0.4162,
+      "recall": 0.9935,
+      "f1": 0.5867,
+      "support": 155
+    },
+    "decision": {
+      "precision": 0.4691,
+      "recall": 0.8172,
+      "f1": 0.5961,
+      "support": 93
+    },
+    "neither": {
+      "precision": 0.9262,
+      "recall": 0.428,
+      "f1": 0.5855,
+      "support": 528
+    }
+  },
+  "legacy_keyword_baseline": {
+    "macro_f1": 0.3235,
+    "per_class": {
+      "action_item": {
+        "precision": 0.0749,
+        "recall": 0.129,
+        "f1": 0.0948
+      },
+      "decision": {
+        "precision": 1.0,
+        "recall": 0.1935,
+        "f1": 0.3243
+      },
+      "neither": {
+        "precision": 0.5723,
+        "recall": 0.5322,
+        "f1": 0.5515
+      }
+    },
+    "note": "The keyword gate this replaced, scored on the same held-out data: 'action:'/'follow up'/'will'/'todo' for actions, 'decision:'/'decided to'/'approved' for decisions."
+  },
+  "slot_extraction": {
+    "method": "rule-based patterns, measured against gold slots",
+    "owner": {
+      "precision": 0.5745,
+      "recall": 0.3484,
+      "f1": 0.4337,
+      "gold_count": 155,
+      "extracted_count": 94
+    },
+    "due_date": {
+      "precision": 1.0,
+      "recall": 0.716,
+      "f1": 0.8345,
+      "gold_count": 81,
+      "extracted_count": 58
+    }
+  },
+  "sklearn_version": "1.8.0",
+  "numpy_version": "2.4.2"
+}
