@@ -5,9 +5,10 @@ from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
 
 from monitoring.metrics import metrics
+from integrations.knowledge import publish, status as knowledge_status
 from nlp.extractor import extract_meeting_intelligence, load_classifier
 from schema.output_schema import to_dict
-from utils.security import request_id_middleware, require_api_key
+from utils.security import current_request_id, request_id_middleware, require_api_key
 from utils.storage import recent_events, save_event
 
 app = FastAPI(title="Autonomous Meeting Intelligence", version="1.0.0")
@@ -15,7 +16,11 @@ app.middleware("http")(request_id_middleware)
 
 
 class TranscriptRequest(BaseModel):
-    transcript: str = Field(..., min_length=1)
+    transcript: str = Field(..., min_length=1, max_length=100000)
+    meeting_id: str = Field("adhoc", max_length=200)
+    title: str = Field("", max_length=500)
+
+
 
 
 @app.exception_handler(HTTPException)
@@ -67,6 +72,7 @@ def health_check():
             "test_macro_f1": metadata["test_macro_f1"],
             "keyword_baseline_macro_f1": metadata["legacy_keyword_baseline"]["macro_f1"],
         },
+        "knowledge_base": knowledge_status(),
     }
 
 
@@ -81,9 +87,20 @@ def events(limit: int = 20):
 
 
 @app.post("/analyze", dependencies=[Depends(require_api_key)])
-def analyze(request: TranscriptRequest):
+def analyze(request: TranscriptRequest, http_request: Request):
     metrics.increment("analyses_total")
-    result = to_dict(extract_meeting_intelligence(request.transcript))
+    summary = extract_meeting_intelligence(request.transcript)
+    result = to_dict(summary)
+
+    # Publish outcomes to the shared knowledge base so they become searchable.
+    # Optional: if retrieval is unset or down, analysis still returns normally
+    # and the response says the publish did not happen.
+    request_id = current_request_id(http_request)
+    result["knowledge_publish"] = publish(
+        request.meeting_id, summary, request_id=request_id, title=request.title or None
+    )
+    if request_id:
+        result["request_id"] = request_id
     save_event(
         "meeting_analysis",
         {
