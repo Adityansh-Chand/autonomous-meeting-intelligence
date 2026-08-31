@@ -49,17 +49,53 @@ DATE_PATTERN = re.compile(
     re.IGNORECASE,
 )
 
-# Owner patterns, tried in order. Each anchors on a role cue rather than simply
-# taking the first capitalised word, which would pick up topic names.
+# --- owner extraction -------------------------------------------------------
+#
+# The first version anchored on role cues and captured a single capitalised word.
+# It recalled 0.3484, and the misses fell into four groups, all visible in the
+# corpus rather than guessed at:
+#
+#   the platform team          no pattern matched a team at all
+#   Dr. Marcus                 the title was dropped, yielding "Marcus"
+#   Ravi Raman                 the surname was taken alone, or missed entirely
+#   Chen has the action on     the cue phrase was not covered
+#
+# So an owner is now one of two shapes, and the cue phrases are enumerated around
+# them rather than a single capitalised word being grabbed near a verb.
+
+# A person: an optional title, a given name, and an optional surname.
+PERSON = r"(?:Dr\.\s+)?[A-Z][a-z]+(?:\s+[A-Z][a-z]+)?"
+
+# A collective owner. Real action items are assigned to teams as often as to
+# people, and "the platform team" is a complete answer to "who owns this".
+TEAM = r"(?:the\s+[a-z]+\s+(?:team|group)|someone\s+from\s+[a-z]+)"
+
+OWNER = f"(?:{TEAM}|{PERSON})"
+
+# Ordered: the first match wins, so more specific cues come first. Each anchors on
+# a phrase that assigns work, never on capitalisation alone -- "Marcus was on mute"
+# names a person who owns nothing.
 OWNER_PATTERNS = [
-    re.compile(r"\b([A-Z][a-z]+)\s+(?:will|is going to|agreed to|takes|owns|said|to)\b"),
-    re.compile(r"\bcan\s+([A-Z][a-z]+)\s+"),
-    re.compile(r"\bon\s+([A-Z][a-z]+)\s+to\b"),
-    re.compile(r"\bwith\s+([A-Z][a-z]+)\s+to\b"),
-    re.compile(r"\bneed\s+([A-Z][a-z]+)\s+to\b"),
-    re.compile(r"\bassigning\s+.*?\s+to\s+([A-Z][a-z]+)"),
-    re.compile(r"\bAction:\s*([A-Z][a-z]+)\b"),
-    re.compile(r"^([A-Z][a-z]+)\s+to\s+", re.MULTILINE),
+    # Owner first, followed by a phrase that commits them to something.
+    re.compile(
+        rf"({OWNER})\s+(?:will|is going to|agreed to|takes|owns"
+        rf"|has the action|please|to\s+)"
+    ),
+    re.compile(rf"Action:\s*({OWNER})"),
+    # Owner last, after a phrase that hands the work over.
+    re.compile(
+        rf"(?:belongs to|assigned to|assigning\s+.*?\s+to|goes to|over to"
+        rf"|hand(?:ed)? to)\s+({OWNER})"
+    ),
+    re.compile(rf"that one's on\s+({OWNER})"),
+    re.compile(
+        rf"can\s+({OWNER})\s+(?:pick|take|confirm|draft|send|review|chase|do)"
+    ),
+    re.compile(rf"put\s+.*?on\s+({OWNER})"),
+    re.compile(rf"from\s+({OWNER})"),
+    re.compile(rf"on\s+({OWNER})\s+to"),
+    re.compile(rf"with\s+({OWNER})\s+to"),
+    re.compile(rf"need\s+({OWNER})\s+to"),
 ]
 
 SPEAKER_PREFIX = re.compile(r"^\s*([A-Z][a-z]+)\s*:\s*")
@@ -88,11 +124,15 @@ def split_sentences(text):
 
 
 def extract_owner(sentence):
-    """First role-anchored capitalised name, or None."""
+    """First cue-anchored owner -- person or team -- or None.
+
+    Returns None rather than guessing. An action item with no stated owner is a
+    real and common thing, and inventing one is worse than reporting none.
+    """
     for pattern in OWNER_PATTERNS:
         match = pattern.search(sentence)
         if match:
-            return match.group(1)
+            return match.group(1).strip()
     return None
 
 
