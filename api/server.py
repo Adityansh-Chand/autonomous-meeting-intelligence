@@ -1,12 +1,15 @@
 
+from pathlib import Path
+
 from fastapi import APIRouter, Depends, FastAPI, HTTPException, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
 
+from monitoring.drift import DriftMonitor
 from monitoring.metrics import metrics
 from integrations.knowledge import publish, status as knowledge_status
-from nlp.extractor import extract_meeting_intelligence, load_classifier
+from nlp.extractor import classify_transcript_sentences, extract_meeting_intelligence, load_classifier
 from schema.output_schema import to_dict
 from utils.security import current_request_id, request_id_middleware, require_api_key
 from utils.storage import recent_events, save_event
@@ -25,6 +28,14 @@ API_VERSION = "v1"
 # The unversioned alias is kept because consumers already call it. It is the
 # deprecation path, not a permanent second interface.
 api = APIRouter()
+
+# The mix of sentence classes this extractor is producing, against the mix seen at
+# training time. If transcripts stop containing decisions, that shows up here
+# before it shows up as an empty summary somebody complains about.
+ARTIFACT_DIR = Path(__file__).resolve().parents[1] / "models" / "artifacts"
+drift_monitor = DriftMonitor.from_file(
+    ARTIFACT_DIR / "drift_reference.json", name="sentence_class_mix"
+)
 
 
 class TranscriptRequest(BaseModel):
@@ -119,6 +130,11 @@ def analyze(request: TranscriptRequest, http_request: Request):
     )
     if request_id:
         result["request_id"] = request_id
+    # Every sentence's label, not just the extracted ones: the reference is the
+    # full class mix, and `neither` is 58% of it.
+    for label in classify_transcript_sentences(request.transcript):
+        drift_monitor.observe(label)
+
     save_event(
         "meeting_analysis",
         {
@@ -129,6 +145,12 @@ def analyze(request: TranscriptRequest, http_request: Request):
         request_id,
     )
     return result
+
+
+@api.get("/drift", dependencies=[Depends(require_api_key)])
+def drift():
+    """Are transcripts still the shape this classifier was fitted on?"""
+    return drift_monitor.report()
 
 
 @app.get("/version")

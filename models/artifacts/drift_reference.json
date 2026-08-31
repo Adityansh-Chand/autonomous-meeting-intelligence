@@ -1,0 +1,14 @@
+{
+  "kind": "categorical",
+  "classes": [
+    "action_item",
+    "decision",
+    "neither"
+  ],
+  "proportions": [
+    0.2679137603043754,
+    0.15091946734305645,
+    0.5811667723525682
+  ],
+  "n_reference": 3154
+}
