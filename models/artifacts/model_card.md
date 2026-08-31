@@ -28,26 +28,26 @@ weather is terrible") so a model keying on "will" or "agreed" is penalised.
 **Held-out templates**, not rows: 18 whole phrasings are removed from
 training, so every test sentence is worded in a way the classifier has never seen.
 
-## Measured performance (held-out, n=776)
+## Measured performance (held-out, n=815)
 
-Macro-F1 **0.5894** (cross-validated on train: 1.0).
+Macro-F1 **0.5441** (cross-validated on train: 1.0).
 
 | Class | Precision | Recall | F1 | Support | Keyword-gate F1 |
 |---|---|---|---|---|---|
-| `action_item` | 0.4162 | 0.9935 | 0.5867 | 155 | 0.0948 |
-| `decision` | 0.4691 | 0.8172 | 0.5961 | 93 | 0.3243 |
-| `neither` | 0.9262 | 0.428 | 0.5855 | 528 | 0.5515 |
+| `action_item` | 0.3941 | 0.9943 | 0.5645 | 176 | 0.0892 |
+| `decision` | 0.4419 | 0.8352 | 0.5779 | 91 | 0.3303 |
+| `neither` | 0.9196 | 0.3339 | 0.49 | 548 | 0.4922 |
 
 The final column is the keyword gate this replaced, scored on the same held-out
-data: **macro-F1 0.3235** against the classifier's
-**0.5894**. The improvement is measured, not asserted.
+data: **macro-F1 0.3039** against the classifier's
+**0.5441**. The improvement is measured, not asserted.
 
 ## Slot extraction (rule-based, on true action items)
 
 | Slot | Precision | Recall | F1 | Gold |
 |---|---|---|---|---|
-| Owner | 0.5745 | 0.3484 | 0.4337 | 155 |
-| Due date | 1.0 | 0.716 | 0.8345 | 81 |
+| Owner | 0.7465 | 0.6023 | 0.6667 | 176 |
+| Due date | 1.0 | 0.7765 | 0.8742 | 85 |
 
 ## Known limitations
 

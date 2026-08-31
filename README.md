@@ -20,7 +20,7 @@ Pydantic schema.
 | Stage | Implementation | Why |
 |---|---|---|
 | Sentence classification | **Learned** — TF-IDF (word + char n-grams) → LogisticRegression | Recognising a decision phrased as *"that settles it"* is not a pattern-matching problem |
-| Owner extraction | **Rules** — role-anchored patterns | Slot filling from an already-classified sentence; patterns are a reasonable tool |
+| Owner extraction | **Rules** — cue-anchored person or team patterns | Slot filling from an already-classified sentence; patterns are a reasonable tool |
 | Due-date extraction | **Rules** — date expression patterns | Same |
 
 The rules are not the problem the previous version had. The problem was that
@@ -62,19 +62,48 @@ them — while firing on *"I will grab a coffee"*.
 
 | Slot | Precision | Recall | F1 |
 |---|---|---|---|
-| Owner | 0.5745 | **0.3484** | 0.4337 |
-| Due date | **1.0000** | 0.7160 | 0.8345 |
+| Owner | 0.7465 | **0.6023** | 0.6667 |
+| Due date | **1.0000** | 0.7765 | 0.8742 |
 
-**Owner recall of 0.35 is poor, and that is the honest number.** The patterns
-anchor on capitalised first names and miss full names, titles and team references
-(*"the platform team"*, *"Dr. Chen"*, *"someone from finance"*). Due-date
-extraction is perfectly precise but misses 28% — the unusual forms
-(*"before the audit"*, *"3rd of June"*, *"once legal signs off"*).
+Owner extraction previously recalled **0.3484**. The patterns anchored on a single
+capitalised first name, so they missed full names, titles and teams — *"Ravi
+Raman"*, *"Dr. Aisha"*, *"the platform team"*, *"someone from finance"* — and
+several assignment phrasings (*"belongs to"*, *"has the action on"*, *"put X on
+Y"*).
 
-An earlier version of this corpus scored **1.0 / 1.0** on both slots. That was not
-a good result; it only demonstrated that the patterns and the generator had been
-written by the same hand. Surface forms the rules do not handle were added
-deliberately, and a test now asserts the scores stay below 0.95.
+Rewriting them around **two owner shapes — a person, or a team — with the cue
+phrases enumerated** took recall to 1.0000 on held-out templates.
+
+### Why that 1.0000 is not the number reported above
+
+A perfect score is the signal this repository treats as a warning, and it was one
+here. The corpus is generated from about twenty templates; a thorough rule set
+will eventually cover all of them, and covering them measures the corpus rather
+than the extractor. It had happened once already — an earlier version scored
+**1.0 / 1.0** and only proved the patterns and the generator were written by the
+same hand.
+
+So the same remedy was applied a second time: harder owner forms were added to the
+generator, chosen from how people actually name each other rather than from what
+is awkward to parse.
+
+- **`Chen and Maya`** — real work is shared, and a single-capture pattern cannot
+  say so
+- **`the on-call engineer`** — a role, not a name
+- **`Priya's team`** — possessive delegation
+- **`R. Raman`** — an initial, common in written notes
+
+Against that harder corpus the honest figures are **0.7465 / 0.6023 / 0.6667** —
+still a large improvement on 0.5745 / 0.3484 / 0.4337, and now measured against a
+task that got harder at the same time.
+
+The precision drop from 1.0000 is informative rather than a regression: on
+*"Chen and Maya will..."* the extractor returns *"Chen"*, which is a partial
+answer counted as wrong. **The extractor cannot represent a multi-owner action
+item**, and the corpus now says so out loud.
+
+A test asserts both slot scores stay below 0.95, which is what forced this to be
+confronted rather than banked.
 
 Full details: [`models/artifacts/model_card.md`](models/artifacts/model_card.md).
 
@@ -351,8 +380,10 @@ are never published — indexing chatter would pollute the corpus for everyone.
   owner gets one class.
 - Due dates are surface strings (*"Friday"*, *"EOD"*), never resolved to calendar
   dates — that needs the meeting date and a timezone.
-- Owner extraction handles capitalised first names only. No surnames, no
-  disambiguation, no mapping to directory identities.
+- Owner extraction returns a single owner. An action item assigned to two people
+  yields the first, counted as wrong — visible in the 0.7465 precision.
+- No disambiguation and no mapping to directory identities: *"Chen"* is a string,
+  not a person.
 - No speaker diarisation, no audio ingestion, no calendar integration.
 - The SQLite event store is an audit trail for demos, not a production system.
 - Docker/Compose/Kubernetes config is validated by static inspection and CI image
