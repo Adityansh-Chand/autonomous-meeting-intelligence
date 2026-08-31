@@ -18,6 +18,10 @@ import os
 
 from integrations.client import OK, ServiceClient
 
+# See the note in the operations service: call the versioned path so a provider
+# can evolve behind /v2 without breaking this consumer on the same deploy.
+API = "/v1"
+
 _client = None
 
 
@@ -77,7 +81,7 @@ def publish(meeting_id, summary, request_id=None, title=None):
         "text": render_document(meeting_id, summary),
         "source": "autonomous-meeting-intelligence",
     }
-    data, outcome = rag_client().post("/documents", payload, request_id=request_id)
+    data, outcome = rag_client().post(f"{API}/documents", payload, request_id=request_id)
     return {
         "published": outcome == OK,
         "outcome": outcome,
