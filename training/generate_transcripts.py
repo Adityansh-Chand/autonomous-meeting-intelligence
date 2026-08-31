@@ -41,9 +41,29 @@ SPEAKERS = ["Priya", "Arjun", "Maya", "Ravi", "Chen", "Sofia", "Daniel", "Aisha"
 
 # Owner surface forms the patterns do not all handle: full names, titles, and
 # team references. Same reasoning as DATES above.
+# Owner surface forms. The same reasoning as DATES below: the extraction patterns
+# must not be able to cover every form, or the score measures the corpus rather
+# than the extractor.
+#
+# The first set is what the patterns handle -- plain names, surnames, titles,
+# teams. Improving those took owner recall from 0.3484 to 1.0000 on held-out
+# templates, and a perfect score is exactly the signal this repository treats as a
+# warning: it meant the corpus had been exhausted, not that the problem was
+# solved.
+#
+# So harder forms were added afterwards, chosen from how people actually name each
+# other in meetings rather than from what would be awkward to parse:
 OWNER_FORMS = [
     "{first}", "{first}", "{first}", "{first}",
     "{first} Raman", "Dr. {first}", "the platform team", "someone from finance",
+    # Two owners. Real work is shared, and a single-capture pattern cannot say so.
+    "{first} and {second}",
+    # A role rather than a name -- whoever is holding the rota that week.
+    "the on-call engineer",
+    # Possessive delegation: the team is the owner, named via a person.
+    "{first}'s team",
+    # An initial. Common in written notes, and not a name-shaped token.
+    "{initial}. Raman",
 ]
 
 TOPICS = [
@@ -157,7 +177,12 @@ def _pick(rng, items):
 def build_sentence(rng, kind, template_index):
     """Return (text, label, owner, due_date, template_id)."""
     topic = _pick(rng, TOPICS)
-    owner = _pick(rng, OWNER_FORMS).format(first=_pick(rng, SPEAKERS))
+    first = _pick(rng, SPEAKERS)
+    # A distinct second name, so "Chen and Chen" cannot be generated.
+    second = _pick(rng, [name for name in SPEAKERS if name != first])
+    owner = _pick(rng, OWNER_FORMS).format(
+        first=first, second=second, initial=first[0]
+    )
     date = _pick(rng, DATES)
 
     if kind == "decision":

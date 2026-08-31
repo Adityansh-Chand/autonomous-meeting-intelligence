@@ -7,8 +7,8 @@
     "neither"
   ],
   "split": "held-out TEMPLATES, not rows -- every test sentence uses phrasing absent from training",
-  "n_train": 2378,
-  "n_test": 776,
+  "n_train": 2355,
+  "n_test": 815,
   "n_held_out_templates": 18,
   "held_out_templates": [
     "action_item:01",
@@ -32,44 +32,44 @@
   ],
   "best_C": 0.5,
   "cv_macro_f1": 1.0,
-  "test_macro_f1": 0.5894,
+  "test_macro_f1": 0.5441,
   "per_class": {
     "action_item": {
-      "precision": 0.4162,
-      "recall": 0.9935,
-      "f1": 0.5867,
-      "support": 155
+      "precision": 0.3941,
+      "recall": 0.9943,
+      "f1": 0.5645,
+      "support": 176
     },
     "decision": {
-      "precision": 0.4691,
-      "recall": 0.8172,
-      "f1": 0.5961,
-      "support": 93
+      "precision": 0.4419,
+      "recall": 0.8352,
+      "f1": 0.5779,
+      "support": 91
     },
     "neither": {
-      "precision": 0.9262,
-      "recall": 0.428,
-      "f1": 0.5855,
-      "support": 528
+      "precision": 0.9196,
+      "recall": 0.3339,
+      "f1": 0.49,
+      "support": 548
     }
   },
   "legacy_keyword_baseline": {
-    "macro_f1": 0.3235,
+    "macro_f1": 0.3039,
     "per_class": {
       "action_item": {
-        "precision": 0.0749,
-        "recall": 0.129,
-        "f1": 0.0948
+        "precision": 0.0694,
+        "recall": 0.125,
+        "f1": 0.0892
       },
       "decision": {
         "precision": 1.0,
-        "recall": 0.1935,
-        "f1": 0.3243
+        "recall": 0.1978,
+        "f1": 0.3303
       },
       "neither": {
-        "precision": 0.5723,
-        "recall": 0.5322,
-        "f1": 0.5515
+        "precision": 0.5271,
+        "recall": 0.4617,
+        "f1": 0.4922
       }
     },
     "note": "The keyword gate this replaced, scored on the same held-out data: 'action:'/'follow up'/'will'/'todo' for actions, 'decision:'/'decided to'/'approved' for decisions."
@@ -77,18 +77,18 @@
   "slot_extraction": {
     "method": "rule-based patterns, measured against gold slots",
     "owner": {
-      "precision": 0.5745,
-      "recall": 0.3484,
-      "f1": 0.4337,
-      "gold_count": 155,
-      "extracted_count": 94
+      "precision": 0.7465,
+      "recall": 0.6023,
+      "f1": 0.6667,
+      "gold_count": 176,
+      "extracted_count": 142
     },
     "due_date": {
       "precision": 1.0,
-      "recall": 0.716,
-      "f1": 0.8345,
-      "gold_count": 81,
-      "extracted_count": 58
+      "recall": 0.7765,
+      "f1": 0.8742,
+      "gold_count": 85,
+      "extracted_count": 66
     }
   },
   "sklearn_version": "1.8.0",
