@@ -366,6 +366,9 @@ are never published — indexing chatter would pollute the corpus for everyone.
 - A test asserting the slot scores are **not** suspiciously perfect.
 - Pydantic schema validation on every response.
 - Transcripts and training reproducible, verified in CI.
+- [Architecture decision records](docs/adr/) for the three contested choices — hardening
+  the corpus when a slot score hit 1.0000, headlining the positive classes rather than the
+  three-class average that `neither` inflates, and where the learned/written line sits.
 
 **What is explicitly not real:**
 
