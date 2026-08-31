@@ -144,3 +144,22 @@ def test_rendered_document_is_self_contained():
     text = render_document("mtg_9", summary)
     assert "Decision:" in text
     assert "Action item" in text
+
+
+def test_publish_uses_the_versioned_endpoint(stub, monkeypatch):
+    """The consumer must ask for /v1, not the deprecated bare path.
+
+    The stub accepts any POST path, so calling the wrong one would pass silently
+    until the alias is removed. This asserts the version guarantee is used, not
+    merely available.
+    """
+    monkeypatch.setenv("RAG_API_URL", stub)
+    reset_client()
+
+    publish("mtg_version_1", extract_meeting_intelligence(TRANSCRIPT))
+
+    assert _Stub.received, "the publish never reached the retrieval service"
+    paths = [entry["path"] for entry in _Stub.received]
+    assert all(path.startswith("/v1/") for path in paths), (
+        f"consumer used unversioned paths: {paths}"
+    )
