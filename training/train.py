@@ -34,10 +34,13 @@ from sklearn.pipeline import FeatureUnion, Pipeline
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
+from monitoring.drift import build_categorical_reference  # noqa: E402
+
 from nlp.extractor import extract_due_date, extract_owner  # noqa: E402
 
 DATA_PATH = ROOT / "datasets" / "transcripts.json"
 ARTIFACT_DIR = ROOT / "models" / "artifacts"
+DRIFT_REFERENCE_PATH = ARTIFACT_DIR / "drift_reference.json"
 CLASSIFIER_PATH = ARTIFACT_DIR / "sentence_classifier.joblib"
 METRICS_PATH = ARTIFACT_DIR / "metrics.json"
 MODEL_CARD_PATH = ARTIFACT_DIR / "model_card.md"
@@ -210,7 +213,14 @@ def train():
         "numpy_version": np.__version__,
     }
     report = classification_report(y_test, predicted, zero_division=0)
-    return model, metrics, report
+    # Drift reference over the PREDICTED CLASS MIX across the whole corpus.
+    # Class mix rather than confidence, for the reason recorded in
+    # monitoring/drift.py: confidence on template-generated text is bimodal and
+    # made the metric swing on ordinary traffic.
+    drift_reference = build_categorical_reference(
+        model.predict([r["text"] for r in rows])
+    )
+    return model, metrics, report, drift_reference
 
 
 def render_model_card(metrics):
@@ -291,7 +301,7 @@ def main():
     parser.add_argument("--verify", action="store_true")
     args = parser.parse_args()
 
-    model, metrics, report = train()
+    model, metrics, report, drift_reference = train()
 
     if args.verify:
         if not METRICS_PATH.exists():
@@ -309,6 +319,11 @@ def main():
     joblib.dump(model, CLASSIFIER_PATH)
     METRICS_PATH.write_text(json.dumps(metrics, indent=2) + "\n", encoding="utf-8")
     MODEL_CARD_PATH.write_text(render_model_card(metrics), encoding="utf-8")
+    # The class mix the classifier produced at training time, so the running
+    # service can tell whether transcripts have changed shape.
+    DRIFT_REFERENCE_PATH.write_text(
+        json.dumps(drift_reference, indent=2) + "\n", encoding="utf-8"
+    )
 
     print(f"split          : {metrics['n_held_out_templates']} templates held out "
           f"({metrics['n_train']} train / {metrics['n_test']} test sentences)")
