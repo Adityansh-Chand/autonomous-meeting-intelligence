@@ -94,8 +94,14 @@ def metrics_endpoint():
 
 
 @api.get("/events", dependencies=[Depends(require_api_key)])
-def events(limit: int = 20):
-    return {"events": recent_events(limit=min(limit, 100))}
+def events(limit: int = 20, request_id: str | None = None):
+    """Recent events, optionally narrowed to one request id.
+
+    `request_id` is what makes this endpoint a trace source rather than a log
+    tail: the portfolio's scripts/trace.py asks all five services the same
+    question and joins the answers into one timeline.
+    """
+    return {"events": recent_events(limit=min(limit, 100), request_id=request_id)}
 
 
 @api.post("/analyze", dependencies=[Depends(require_api_key)])
@@ -120,6 +126,7 @@ def analyze(request: TranscriptRequest, http_request: Request):
             "decision_count": len(result["decisions"]),
             "action_count": len(result["action_items"]),
         },
+        request_id,
     )
     return result
 
