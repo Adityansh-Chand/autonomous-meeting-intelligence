@@ -198,3 +198,17 @@ def extract_meeting_intelligence(text):
         decisions=decisions,
         action_items=action_items,
     )
+
+
+def classify_transcript_sentences(text):
+    """Label for every sentence, including `neither`.
+
+    Kept separate from `extract_meeting_intelligence` so the response schema does
+    not change: attaching these to `MeetingSummary` would alter the shape the
+    contract checks pin, for the sake of a monitoring signal.
+
+    Drift monitoring needs the whole mix. Observing only extracted items would
+    compare a live distribution that can never contain `neither` against a
+    reference that is 58% `neither`, and report drift on every transcript.
+    """
+    return classify_sentences(split_sentences(text))
