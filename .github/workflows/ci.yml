@@ -27,6 +27,35 @@ jobs:
       - name: Run evaluation
         run: python evaluation/evaluate.py
 
+  real-data:
+    name: Validate on real data
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      # 23MB of manual annotations only. The full corpus with audio and video is
+      # ~100GB and is not needed: this task is text.
+      - name: Cache AMI annotations
+        uses: actions/cache@v4
+        with:
+          path: datasets/real
+          key: ami-${{ hashFiles('training/fetch_real_data.py') }}
+
+      - name: Fetch real dataset
+        run: python training/fetch_real_data.py --check || python training/fetch_real_data.py
+      - name: Real dataset checksum matches
+        run: python training/fetch_real_data.py --check
+
+      - name: Committed real-data metrics are reproducible
+        run: python training/train_real.py --verify
+      - name: Real-data quality gate
+        run: python -m pytest -q tests/test_real_data_quality.py
+
   docker-build:
     name: Docker image build
     runs-on: ubuntu-latest

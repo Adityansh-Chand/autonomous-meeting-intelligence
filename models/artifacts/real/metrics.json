@@ -1,0 +1,113 @@
+{
+  "model_type": "TF-IDF (word + char n-grams) -> LogisticRegression, 3-class",
+  "note": "same pipeline as the served extractor, fitted on real meetings",
+  "data_source": "REAL -- AMI Meeting Corpus manual annotations (CC BY 4.0)",
+  "citation": "Carletta et al., 'The AMI Meeting Corpus: A Pre-Announcement', MLMI 2005",
+  "url": "https://groups.inf.ed.ac.uk/ami/corpus/",
+  "label_construction": "a dialogue act linked by extractive/summlink.xml to a summary sentence under DECISIONS is a decision, under ACTIONS an action item, everything else neither -- labels derive from human annotators summarising the meeting, not from anyone seeking a learnable pattern",
+  "split": "held-out MEETINGS -- every test utterance comes from a meeting absent from training",
+  "n_meetings": 137,
+  "n_held_out_meetings": 34,
+  "held_out_meetings": [
+    "ES2002d",
+    "ES2003d",
+    "ES2004d",
+    "ES2005d",
+    "ES2006d",
+    "ES2007d",
+    "ES2008d",
+    "ES2009d",
+    "ES2010d",
+    "ES2011d",
+    "ES2012d",
+    "ES2013d",
+    "ES2014d",
+    "ES2015d",
+    "ES2016d",
+    "IS1000d",
+    "IS1001d",
+    "IS1003a",
+    "IS1004a",
+    "IS1005a",
+    "IS1006b",
+    "IS1007b",
+    "IS1008b",
+    "IS1009b",
+    "TS3003b",
+    "TS3004b",
+    "TS3005b",
+    "TS3006b",
+    "TS3007b",
+    "TS3008b",
+    "TS3009b",
+    "TS3010b",
+    "TS3011b",
+    "TS3012b"
+  ],
+  "n_total": 108338,
+  "n_train": 78408,
+  "n_test": 29930,
+  "class_counts": {
+    "neither": 106617,
+    "decision": 1350,
+    "action_item": 371
+  },
+  "positive_rate": 0.0159,
+  "accuracy_note": "deliberately not reported: at a 1.6% positive rate, predicting 'neither' everywhere scores 98.4% and finds nothing",
+  "dataset_construction_stats": {
+    "ambiguous_dropped": 10,
+    "meetings_without_summlink": 5
+  },
+  "best_C": 4.0,
+  "cv_folds": 3,
+  "cv_macro_f1": 0.4899,
+  "headline_positive_class_macro_f1": 0.1799,
+  "headline_note": "mean F1 over `decision` and `action_item` only. The 3-class macro-F1 below is carried by `neither`, which is 98% of the data and trivially easy -- it is reported for comparability with the synthetic track, not as a claim about how well this finds decisions",
+  "test_macro_f1": 0.4462,
+  "per_class": {
+    "action_item": {
+      "precision": 0.1435,
+      "recall": 0.4545,
+      "f1": 0.2182,
+      "support": 66
+    },
+    "decision": {
+      "precision": 0.1061,
+      "recall": 0.213,
+      "f1": 0.1417,
+      "support": 399
+    },
+    "neither": {
+      "precision": 0.988,
+      "recall": 0.9697,
+      "f1": 0.9787,
+      "support": 29465
+    }
+  },
+  "keyword_baseline": {
+    "positive_class_macro_f1": 0.0244,
+    "macro_f1": 0.3438,
+    "per_class": {
+      "action_item": {
+        "precision": 0.02,
+        "recall": 0.1667,
+        "f1": 0.0358,
+        "support": 66
+      },
+      "decision": {
+        "precision": 0.0492,
+        "recall": 0.0075,
+        "f1": 0.013,
+        "support": 399
+      },
+      "neither": {
+        "precision": 0.9849,
+        "recall": 0.9801,
+        "f1": 0.9825,
+        "support": 29465
+      }
+    }
+  },
+  "sklearn_version": "1.8.0",
+  "numpy_version": "2.4.2"
+}
